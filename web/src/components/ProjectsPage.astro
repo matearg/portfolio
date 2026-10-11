@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from './ProjectCard.astro';
+import { copy, type Lang } from '../i18n';
+import type { Project } from '../lib/api';
+
+interface Props { lang: Lang; projects: Project[]; }
+const { lang, projects } = Astro.props;
+const t = copy[lang];
+const featured = projects.find((p) => p.featured);
+const rest = projects.filter((p) => p !== featured);
+const tags = [...new Set(projects.flatMap((p) => p.tags))];
+const count = (n: number) => `${n} ${n === 1 ? t.one : t.many}`;
+const home = lang === 'es' ? '/es/' : '/';
+---
+<Base lang={lang} page="projects">
+  <main class="wrap" style="padding-block:clamp(40px,7vw,88px) 80px;display:flex;flex-direction:column;gap:48px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <a class="lk" href={home} style="align-self:flex-start"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4"></path></svg>{t.back}</a>
+      <h1 style="margin:0;font-size:clamp(48px,7vw,104px);line-height:.95;letter-spacing:-.045em;font-weight:600">{t.title}<span style="color:var(--accent)">.</span></h1>
+      <p style="margin:0;max-width:52ch;font-size:19px;line-height:1.5;color:#b4b4bb">{t.intro}</p>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+      <div id="chips" role="group" aria-label={t.filterLabel} style="display:flex;flex-wrap:wrap;gap:8px">
+        {projects.length > 0 && [['all', t.all], ...tags.map((x) => [x, x])].map(([id, label]) => (
+          <button type="button" class="chip" data-chip={id} aria-pressed={id === 'all' ? 'true' : 'false'}>{label}</button>
+        ))}
+      </div>
+      <p id="count" class="mono" aria-live="polite" data-one={t.one} data-many={t.many} style="margin:0;font-size:13px;color:var(--muted)">{count(projects.length)}</p>
+    </div>
+
+    {featured && <ProjectCard project={featured} lang={lang} index={0} variant="featured" />}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px">
+      {rest.map((p, i) => <ProjectCard project={p} lang={lang} index={i + (featured ? 1 : 0)} variant="list" />)}
+    </div>
+    <p id="empty" class="mono" hidden={projects.length > 0} style="margin:0;padding:48px;text-align:center;border:1px dashed #2a2a2f;border-radius:14px;color:var(--muted)">{t.empty}</p>
+  </main>
+</Base>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('[data-chip]');
+  const cards = document.querySelectorAll<HTMLElement>('[data-tags]');
+  const count = document.getElementById('count')!;
+  const empty = document.getElementById('empty')!;
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      const id = chip.dataset.chip!;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      let n = 0;
+      cards.forEach((card) => {
+        const show = id === 'all' || card.dataset.tags!.split('|').includes(id);
+        card.hidden = !show;
+        if (show) n++;
+      });
+      count.textContent = `${n} ${n === 1 ? count.dataset.one : count.dataset.many}`;
+      empty.hidden = n > 0;
+    }),
+  );
+</script>

@@ -1,0 +1,15 @@
+# Local development database only.
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: portfolio
+      POSTGRES_DB: portfolio
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql
+
+volumes:
+  db:

@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mateo Arcidiacono — Landing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0a0a0b}
+a{color:#ededee}a:hover{color:#ffffff}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.nl{color:#a1a1aa;text-decoration:none;font-size:14px;min-height:44px;display:inline-flex;align-items:center}
+.nl:hover{color:#ededee}
+.lt{font:500 12px 'JetBrains Mono',monospace;min-width:44px;min-height:32px;border:0;border-radius:999px;background:transparent;color:#a1a1aa;cursor:pointer}
+.lt.on{background:var(--accent);color:#0a0a0b}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;transition:transform .2s,background .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-a{background:var(--accent);color:#0a0a0b}.btn-a:hover{color:#0a0a0b}
+.btn-o{border:1px solid #34343a;color:#ededee}.btn-o:hover{border-color:var(--accent)}
+.ul{color:#ededee;text-decoration:none;border-bottom:1px solid #34343a;padding-bottom:4px;font-size:15px}
+.ul:hover{border-color:var(--accent)}
+.card{color:#ededee;text-decoration:none;display:flex;flex-direction:column}
+.card .thumb{transition:border-color .25s,background-position .6s}
+.card:hover .thumb{border-color:var(--accent);background-position:12px 12px}
+.card:hover h3{color:var(--accent)}
+.tag{font:400 12px 'JetBrains Mono',monospace;color:#c4c4cc;border:1px solid #2a2a2f;border-radius:999px;padding:4px 10px}
+.t-grid{background-color:#0e0e10;background-image:linear-gradient(#1d1d22 1px,transparent 1px),linear-gradient(90deg,#1d1d22 1px,transparent 1px);background-size:28px 28px}
+.t-rings{background-color:#0e0e10;background-image:repeating-radial-gradient(circle at 72% 28%,#0e0e10 0 18px,#1d1d22 18px 19px)}
+.t-lines{background-color:#0e0e10;background-image:repeating-linear-gradient(135deg,#0e0e10 0 11px,#1d1d22 11px 12px)}
+.progress{display:none}
+@keyframes rv-in{from{opacity:0;transform:translateY(56px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes cue{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(6px);opacity:1}}
+@media (prefers-reduced-motion:no-preference){
+  @supports (animation-timeline:view()){
+    .rv{animation:rv-in linear both;animation-timeline:view();animation-range:entry 0% cover 28%}
+    .rv2{animation-range:entry 8% cover 34%}
+    .rv3{animation-range:entry 16% cover 40%}
+    .progress{display:block;animation:grow linear both;animation-timeline:scroll(root)}
+  }
+  .marquee{animation:slide 40s linear infinite}
+  .cue{animation:cue 1.8s ease-in-out infinite}
+}
+</style>
+</helmet>
+<div id="top" style="--accent: {{accent}}; position: relative; min-height: 100%; background: #0a0a0b; color: #ededee; font-family: 'Geist', ui-sans-serif, sans-serif; overflow-x: clip">
+<canvas ref="{{setBg}}" aria-hidden="true" style="position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0"></canvas>
+<div class="progress" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: {{accent}}; transform-origin: 0 50%; z-index: 30"></div>
+
+<div style="position: relative; z-index: 1">
+<header style="position: sticky; top: 0; z-index: 20; background: rgba(10,10,11,0.72); backdrop-filter: blur(14px); border-bottom: 1px solid #1d1d21">
+<nav aria-label="Main" style="max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px">
+<a href="#top" class="mono" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; font-weight: 500; color: #ededee; text-decoration: none"><span aria-hidden="true" style="width: 10px; height: 10px; background: {{accent}}; display: inline-block"></span>mateo.arcidiacono</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 22px">
+<a class="nl" href="#work">{{t.navWork}}</a>
+<a class="nl" href="#about">{{t.navAbout}}</a>
+<a class="nl" href="Projects.dc.html">{{t.navProjects}}</a>
+<a class="nl" href="#contact">{{t.navContact}}</a>
+<div role="group" aria-label="Language" style="display: flex; gap: 2px; border: 1px solid #2a2a2f; border-radius: 999px; padding: 3px">
+<button type="button" class="lt {{enCls}}" aria-pressed="{{enPressed}}" onClick="{{setEn}}">EN</button>
+<button type="button" class="lt {{esCls}}" aria-pressed="{{esPressed}}" onClick="{{setEs}}">ES</button>
+</div>
+</div>
+</nav>
+</header>
+
+<main>
+<section ref="{{setHero}}" aria-label="Intro" style="max-width: 1240px; margin: 0 auto; padding: clamp(40px, 7vw, 88px) clamp(16px, 4vw, 48px) 48px; box-sizing: border-box; min-height: 780px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr)); align-items: center; gap: 24px 40px">
+<div style="display: flex; flex-direction: column; gap: 28px">
+<p class="mono" style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: 0.04em; color: #8f8f98"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{accent}}; display: inline-block"></span>{{t.role}} · [City, Country]</p>
+<h1 style="margin: 0; font-size: clamp(48px, 8.4vw, 128px); line-height: 0.92; letter-spacing: -0.045em; font-weight: 600">Mateo<br>Arcidiacono<span style="color: {{accent}}">.</span></h1>
+<p style="margin: 0; max-width: 36ch; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.5; color: #b4b4bb">{{t.tagline}}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a class="btn btn-a" href="Projects.dc.html">{{t.ctaProjects}}<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"></path></svg></a>
+<a class="btn btn-o" href="#contact">{{t.ctaContact}}</a>
+</div>
+</div>
+<div style="position: relative; width: 100%; max-width: 600px; aspect-ratio: 1 / 1; justify-self: center">
+<canvas ref="{{setIco}}" role="img" aria-label="Wireframe geodesic sphere that morphs, follows the cursor and turns with scroll" style="display: block; width: 100%; height: 100%"></canvas>
+<span class="mono" aria-hidden="true" style="position: absolute; top: 8px; left: 8px; font-size: 11px; color: #6b6b74">fig.01 — icosphere / 42v · 120e</span>
+<span class="mono" aria-hidden="true" style="position: absolute; bottom: 8px; right: 8px; font-size: 11px; color: #6b6b74">{{t.hint}}</span>
+</div>
+<a href="#work" class="mono cue" style="grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 12px; color: #8f8f98; text-decoration: none">{{t.scroll}}<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4"></path></svg></a>
+</section>
+
+<section aria-label="Stack" style="border-top: 1px solid #1d1d21; border-bottom: 1px solid #1d1d21; background: rgba(10,10,11,0.6); overflow: hidden">
+<div class="marquee" style="display: flex; width: max-content">
+<sc-for list="{{stackLoop}}" as="s" hint-placeholder-count="24">
+<span class="mono" style="display: inline-flex; align-items: center; gap: 28px; padding: 22px 0 22px 28px; font-size: 15px; color: #d4d4d8; white-space: nowrap">{{s}}<span aria-hidden="true" style="width: 6px; height: 6px; background: {{accent}}; transform: rotate(45deg); display: inline-block"></span></span>
+</sc-for>
+</div>
+</section>
+
+<section id="work" style="max-width: 1240px; margin: 0 auto; padding: 120px clamp(16px, 4vw, 48px) 40px; display: flex; flex-direction: column; gap: 48px">
+<div class="rv" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<p class="mono" style="margin: 0; font-size: 13px; color: {{accent}}">01 / {{t.workLabel}}</p>
+<h2 style="margin: 0; font-size: clamp(36px, 5vw, 72px); line-height: 1; letter-spacing: -0.035em; font-weight: 600">{{t.workTitle}}</h2>
+</div>
+<a class="ul" href="Projects.dc.html">{{t.workAll}} →</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px">
+<sc-for list="{{work}}" as="p" hint-placeholder-count="3">
+<a class="card rv {{p.rvc}}" href="Projects.dc.html">
+<div class="thumb {{p.thumb}}" style="position: relative; aspect-ratio: 4 / 3; border: 1px solid #232327; border-radius: 12px; overflow: hidden; display: flex; align-items: flex-end; padding: 16px; box-sizing: border-box">
+<span aria-hidden="true" style="position: absolute; top: 16px; left: 16px; width: 8px; height: 8px; background: {{accent}}"></span>
+<span class="mono" aria-hidden="true" style="font-size: 72px; line-height: 1; color: #2a2a30">{{p.n}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px 2px 4px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+<h3 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; transition: color 0.2s">{{t.projName}}</h3>
+<span class="mono" style="font-size: 12px; color: #8f8f98">[Year]</span>
+</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #a1a1aa">{{t.projDesc}}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{p.tags}}" as="tag" hint-placeholder-count="2"><span class="tag">{{tag}}</span></sc-for>
+</div>
+</div>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section id="about" style="max-width: 1240px; margin: 0 auto; padding: 120px clamp(16px, 4vw, 48px) 40px; display: flex; flex-direction: column; gap: 56px">
+<div class="rv" style="display: flex; flex-direction: column; gap: 14px">
+<p class="mono" style="margin: 0; font-size: 13px; color: {{accent}}">02 / {{t.aboutLabel}}</p>
+<h2 style="margin: 0; max-width: 16ch; font-size: clamp(36px, 5vw, 72px); line-height: 1; letter-spacing: -0.035em; font-weight: 600">{{t.aboutTitle}}</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 40px 64px; align-items: start">
+<p class="rv" style="margin: 0; font-size: clamp(19px, 1.8vw, 24px); line-height: 1.55; color: #c4c4cc">{{t.aboutBody}}</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 24px">
+<sc-for list="{{t.cols}}" as="c" hint-placeholder-count="3">
+<div class="rv {{c.rvc}}" style="display: flex; flex-direction: column; gap: 12px; padding-top: 16px; border-top: 1px solid #2a2a2f">
+<p class="mono" style="margin: 0; font-size: 12px; color: {{accent}}">{{c.label}}</p>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.4; color: #c4c4cc">
+<sc-for list="{{c.items}}" as="it" hint-placeholder-count="3"><li>{{it}}</li></sc-for>
+</ul>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 class="rv" style="margin: 0 0 8px; font-size: 22px; font-weight: 600">{{t.expTitle}}</h3>
+<ol style="margin: 0; padding: 0; list-style: none">
+<sc-for list="{{t.exp}}" as="e" hint-placeholder-count="3">
+<li class="rv" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 8px 32px; padding: 24px 0; border-top: 1px solid #1d1d21">
+<span class="mono" style="font-size: 13px; color: #8f8f98">{{e.period}}</span>
+<span style="font-size: 18px; font-weight: 500">{{e.role}} <span style="color: #8f8f98">· {{e.company}}</span></span>
+<span style="font-size: 15px; line-height: 1.5; color: #a1a1aa">{{e.desc}}</span>
+</li>
+</sc-for>
+</ol>
+</div>
+</section>
+
+<section id="contact" style="max-width: 1240px; margin: 0 auto; padding: 120px clamp(16px, 4vw, 48px) 80px">
+<div class="rv" style="display: flex; flex-direction: column; gap: 28px; padding: clamp(28px, 5vw, 72px); border: 1px solid #232327; border-radius: 20px; background: rgba(17,17,19,0.78)">
+<p class="mono" style="margin: 0; font-size: 13px; color: {{accent}}">03 / {{t.contactLabel}}</p>
+<h2 style="margin: 0; font-size: clamp(44px, 7vw, 112px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 600">{{t.contactTitle}}</h2>
+<p style="margin: 0; max-width: 40ch; font-size: 19px; line-height: 1.5; color: #b4b4bb">{{t.contactBody}}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a class="btn btn-a" href="#contact">[your@email.com]</a>
+<a class="btn btn-o" href="#contact">GitHub ↗</a>
+<a class="btn btn-o" href="#contact">LinkedIn ↗</a>
+</div>
+</div>
+</section>
+</main>
+
+<footer class="mono" style="max-width: 1240px; margin: 0 auto; padding: 28px clamp(16px, 4vw, 48px) 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 12px; color: #8f8f98; border-top: 1px solid #1d1d21">
+<span>© 2026 Mateo Arcidiacono</span>
+<span>{{t.built}}</span>
+</footer>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#c6ff3d","options":["#c6ff3d","#5ce1ff","#ff8a3d"]},"$preview":{"width":1440,"height":3700}}'>
+class Component extends DCLogic {
+  state = { lang: 'en' };
+
+  setBg = (el) => { this.bg = el; };
+  setIco = (el) => { this.ico = el; };
+  setHero = (el) => { this.hero = el; };
+
+  componentDidMount() {
+    this.m = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4 };
+    this.tilt = { x: 0, y: 0 };
+    this.geo = this.icosphere();
+    this.onMove = (e) => { this.m.tx = e.clientX; this.m.ty = e.clientY; };
+    this.onLeave = () => { this.m.tx = -1e4; this.m.ty = -1e4; };
+    window.addEventListener('pointermove', this.onMove, { passive: true });
+    document.documentElement.addEventListener('pointerleave', this.onLeave);
+    // Reduced motion: draw one still frame, no loop.
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const loop = (ms) => {
+      this.frame(ms / 1000);
+      if (!this.reduced) this.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.raf);
+    window.removeEventListener('pointermove', this.onMove);
+    document.documentElement.removeEventListener('pointerleave', this.onLeave);
+  }
+
+  // Icosahedron subdivided once: 42 vertices, 120 edges, on the unit sphere.
+  icosphere() {
+    const t = (1 + Math.sqrt(5)) / 2;
+    const v = [[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]];
+    const adj = (i, j) => Math.abs((v[i][0]-v[j][0])**2 + (v[i][1]-v[j][1])**2 + (v[i][2]-v[j][2])**2 - 4) < 1e-6;
+    const key = (a, b) => (a < b ? a + '_' + b : b + '_' + a);
+    const verts = v.map((p) => p.slice());
+    const mids = {};
+    const mid = (a, b) => {
+      const k = key(a, b);
+      if (mids[k] === undefined) {
+        mids[k] = verts.length;
+        verts.push([(v[a][0]+v[b][0])/2, (v[a][1]+v[b][1])/2, (v[a][2]+v[b][2])/2]);
+      }
+      return mids[k];
+    };
+    const edges = new Map();
+    const add = (a, b) => edges.set(key(a, b), [a, b]);
+    for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) for (let k = j + 1; k < 12; k++) {
+      if (!(adj(i, j) && adj(j, k) && adj(i, k))) continue;
+      const ab = mid(i, j), bc = mid(j, k), ca = mid(k, i);
+      add(i, ab); add(ab, j); add(j, bc); add(bc, k); add(k, ca); add(ca, i); add(ab, bc); add(bc, ca); add(ca, ab);
+    }
+    return {
+      verts: verts.map((p) => { const l = Math.hypot(p[0], p[1], p[2]); return [p[0]/l, p[1]/l, p[2]/l]; }),
+      edges: [...edges.values()],
+    };
+  }
+
+  fit(c, maxDpr) {
+    const w = c.clientWidth, h = c.clientHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    const W = Math.round(w * dpr), H = Math.round(h * dpr);
+    if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+
+  frame(t) {
+    const m = this.m;
+    if (m.tx < -5000 || m.x < -5000) { m.x = m.tx; m.y = m.ty; }
+    else { m.x += (m.tx - m.x) * 0.15; m.y += (m.ty - m.y) * 0.15; }
+    const accent = this.props.accent ?? '#c6ff3d';
+    if (this.bg) this.drawField(accent);
+    if (this.ico) this.drawSphere(t, accent);
+  }
+
+  // Dot grid; dots near the cursor are pushed away, grow and take the accent.
+  drawField(accent) {
+    const { ctx, w, h } = this.fit(this.bg, 1);
+    const gap = 28, R = 170, mx = this.m.x, my = this.m.y;
+    const near = [];
+    ctx.fillStyle = 'rgba(255,255,255,0.09)';
+    for (let y = gap / 2; y < h; y += gap) for (let x = gap / 2; x < w; x += gap) {
+      const dx = x - mx, dy = y - my, d = Math.hypot(dx, dy);
+      if (d < R) near.push([x, y, dx, dy, d]); else ctx.fillRect(x - 0.75, y - 0.75, 1.5, 1.5);
+    }
+    ctx.fillStyle = accent;
+    near.forEach(([x, y, dx, dy, d]) => {
+      const f = 1 - d / R, k = d ? (f * f * 22) / d : 0, s = 1.5 + f * 2;
+      ctx.globalAlpha = 0.15 + f * 0.75;
+      ctx.fillRect(x + dx * k - s / 2, y + dy * k - s / 2, s, s);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  drawSphere(t, accent) {
+    const { ctx, w, h } = this.fit(this.ico, 2);
+    const r = this.ico.getBoundingClientRect();
+    const has = this.m.x > -5000;
+    const tx = has ? (this.m.x - (r.left + r.width / 2)) / window.innerWidth : 0;
+    const ty = has ? (this.m.y - (r.top + r.height / 2)) / window.innerHeight : 0;
+    this.tilt.x += (tx - this.tilt.x) * 0.06;
+    this.tilt.y += (ty - this.tilt.y) * 0.06;
+    const p = this.hero ? Math.max(0, -this.hero.getBoundingClientRect().top) / 700 : 0;
+    const ry = t * 0.22 + p * 2.6 + this.tilt.x * 1.6;
+    const rx = 0.3 + p * 0.9 + this.tilt.y * 1.2;
+    const cy = Math.cos(ry), sy = Math.sin(ry), cx = Math.cos(rx), sx = Math.sin(rx);
+    const S = Math.min(w, h) * 0.28, ox = w / 2, oy = h / 2;
+    const rot = (x, y, z) => { const x1 = x * cy + z * sy, z1 = -x * sy + z * cy; return [x1, y * cx - z1 * sx, y * sx + z1 * cx]; };
+    const proj = (q) => { const k = 5 / (5 + q[2]); return [ox + q[0] * S * k, oy + q[1] * S * k, q[2]]; };
+    const pts = this.geo.verts.map(([x, y, z]) => {
+      const n = 1 + 0.11 * Math.sin(2.3 * x + t * 1.1) * Math.cos(2.1 * y + t * 0.8) + 0.05 * Math.sin(3.4 * z - t * 1.4);
+      return proj(rot(x * n, y * n, z * n));
+    });
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 1;
+    this.geo.edges.forEach(([a, b]) => {
+      const z = (pts[a][2] + pts[b][2]) / 2;
+      ctx.globalAlpha = 0.12 + 0.78 * Math.min(1, Math.max(0, (1.15 - z) / 2.3));
+      ctx.beginPath(); ctx.moveTo(pts[a][0], pts[a][1]); ctx.lineTo(pts[b][0], pts[b][1]); ctx.stroke();
+    });
+    ctx.fillStyle = '#ededee';
+    pts.forEach(([x, y, z]) => { if (z < 0) { ctx.globalAlpha = Math.min(1, -z); ctx.fillRect(x - 1.5, y - 1.5, 3, 3); } });
+    ctx.strokeStyle = '#ededee';
+    ctx.globalAlpha = 0.22;
+    ctx.setLineDash([2, 6]);
+    ctx.beginPath();
+    for (let i = 0; i <= 96; i++) {
+      const a = (i / 96) * Math.PI * 2 + t * 0.15;
+      const q = proj(rot(Math.cos(a) * 1.3, 0.2 * Math.sin(a), Math.sin(a) * 1.3));
+      if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+  }
+
+  copy() {
+    return {
+      en: {
+        navWork: 'Work', navAbout: 'About', navProjects: 'Projects', navContact: 'Contact',
+        role: 'Fullstack developer',
+        tagline: 'I build web products end to end — from the database schema to the last pixel of the interface.',
+        ctaProjects: 'View projects', ctaContact: 'Get in touch',
+        hint: 'move your cursor', scroll: 'Scroll',
+        workLabel: 'Selected work', workTitle: 'Things I’ve built', workAll: 'All projects',
+        projName: '[Project name]', projDesc: '[One line: what it does and the problem it solved]',
+        aboutLabel: 'About', aboutTitle: 'The whole stack, end to end.',
+        aboutBody: 'I work across the whole stack: interfaces in Astro and TypeScript, APIs in Node.js with NestJS, and data modeled in PostgreSQL with Prisma. I like software that is fast, readable and easy to change.',
+        cols: [
+          { label: 'Frontend', rvc: '', items: ['Astro, TypeScript', 'Accessible, responsive UI', 'Motion and 3D on the web'] },
+          { label: 'Backend', rvc: 'rv2', items: ['Node.js, NestJS', 'REST API design', 'Auth and validation'] },
+          { label: 'Data', rvc: 'rv3', items: ['PostgreSQL', 'Prisma schema and migrations', 'Query tuning'] },
+        ],
+        expTitle: 'Experience',
+        exp: [
+          { period: '[Year] — now', role: '[Role]', company: '[Company]', desc: '[What you shipped there, in one line]' },
+          { period: '[Year] — [Year]', role: '[Role]', company: '[Company]', desc: '[What you shipped there, in one line]' },
+          { period: '[Year] — [Year]', role: '[Role]', company: '[Company]', desc: '[What you shipped there, in one line]' },
+        ],
+        contactLabel: 'Contact', contactTitle: 'Let’s build something.',
+        contactBody: 'Have a project or a role in mind? Let’s talk.',
+        built: 'Built with Astro, NestJS & PostgreSQL',
+      },
+      es: {
+        navWork: 'Trabajo', navAbout: 'Sobre mí', navProjects: 'Proyectos', navContact: 'Contacto',
+        role: 'Desarrollador fullstack',
+        tagline: 'Construyo productos web de punta a punta — desde el esquema de la base de datos hasta el último píxel de la interfaz.',
+        ctaProjects: 'Ver proyectos', ctaContact: 'Contactar',
+        hint: 'mueve el cursor', scroll: 'Bajar',
+        workLabel: 'Trabajo destacado', workTitle: 'Cosas que construí', workAll: 'Todos los proyectos',
+        projName: '[Nombre del proyecto]', projDesc: '[Una línea: qué hace y qué problema resolvió]',
+        aboutLabel: 'Sobre mí', aboutTitle: 'Todo el stack, de punta a punta.',
+        aboutBody: 'Trabajo en todo el stack: interfaces con Astro y TypeScript, APIs en Node.js con NestJS y datos modelados en PostgreSQL con Prisma. Me gusta el software rápido, legible y fácil de cambiar.',
+        cols: [
+          { label: 'Frontend', rvc: '', items: ['Astro, TypeScript', 'Interfaces accesibles y responsivas', 'Animación y 3D en la web'] },
+          { label: 'Backend', rvc: 'rv2', items: ['Node.js, NestJS', 'Diseño de APIs REST', 'Autenticación y validación'] },
+          { label: 'Datos', rvc: 'rv3', items: ['PostgreSQL', 'Esquemas y migraciones con Prisma', 'Optimización de consultas'] },
+        ],
+        expTitle: 'Experiencia',
+        exp: [
+          { period: '[Año] — hoy', role: '[Puesto]', company: '[Empresa]', desc: '[Qué entregaste ahí, en una línea]' },
+          { period: '[Año] — [Año]', role: '[Puesto]', company: '[Empresa]', desc: '[Qué entregaste ahí, en una línea]' },
+          { period: '[Año] — [Año]', role: '[Puesto]', company: '[Empresa]', desc: '[Qué entregaste ahí, en una línea]' },
+        ],
+        contactLabel: 'Contacto', contactTitle: 'Construyamos algo.',
+        contactBody: '¿Tienes un proyecto o un puesto en mente? Hablemos.',
+        built: 'Hecho con Astro, NestJS y PostgreSQL',
+      },
+    };
+  }
+
+  renderVals() {
+    const lang = this.state.lang;
+    const stack = ['Astro', 'TypeScript', 'Node.js', 'NestJS', 'PostgreSQL', 'Prisma'];
+    return {
+      t: this.copy()[lang],
+      accent: this.props.accent ?? '#c6ff3d',
+      setBg: this.setBg, setIco: this.setIco, setHero: this.setHero,
+      setEn: () => this.setState({ lang: 'en' }),
+      setEs: () => this.setState({ lang: 'es' }),
+      enCls: lang === 'en' ? 'on' : '', esCls: lang === 'es' ? 'on' : '',
+      enPressed: String(lang === 'en'), esPressed: String(lang === 'es'),
+      // Four copies so the -50% marquee loop never shows a gap at 1440px.
+      stackLoop: [...stack, ...stack, ...stack, ...stack],
+      work: [
+        { n: '01', thumb: 't-grid', rvc: '', tags: ['Astro', 'TypeScript'] },
+        { n: '02', thumb: 't-rings', rvc: 'rv2', tags: ['NestJS', 'PostgreSQL'] },
+        { n: '03', thumb: 't-lines', rvc: 'rv3', tags: ['Astro', 'NestJS', 'Prisma'] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

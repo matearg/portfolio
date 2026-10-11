@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from './Hero.astro';
+import ProjectCard from './ProjectCard.astro';
+import { copy, stack, type Lang } from '../i18n';
+import type { Project } from '../lib/api';
+
+interface Props { lang: Lang; projects: Project[]; }
+const { lang, projects } = Astro.props;
+const t = copy[lang];
+const loop = [...stack, ...stack, ...stack, ...stack]; // four copies so the -50% marquee never shows a gap at 1440px
+const sec = 'padding-block:120px 40px;display:flex;flex-direction:column';
+---
+<Base lang={lang} page="home">
+  <main style="overflow-x:clip">
+    <Hero lang={lang} />
+
+    <section aria-label="Stack" style="border-block:1px solid #1d1d21;background:rgba(10,10,11,.6);overflow:hidden">
+      <div class="marquee" style="display:flex;width:max-content">
+        {loop.map((s, i) => (
+          <span class="mono" aria-hidden={i >= stack.length ? 'true' : undefined} style="display:inline-flex;align-items:center;gap:28px;padding:22px 0 22px 28px;font-size:15px;color:#d4d4d8;white-space:nowrap">{s}<span aria-hidden="true" style="width:6px;height:6px;background:var(--accent);transform:rotate(45deg);display:inline-block"></span></span>
+        ))}
+      </div>
+    </section>
+
+    <section id="work" class="wrap" style={`${sec};gap:48px`}>
+      <div class="rv" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">01 / {t.workLabel}</p>
+          <h2 style="margin:0;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.workTitle}</h2>
+        </div>
+        <a class="ul" href={lang === 'es' ? '/es/projects' : '/projects'}>{t.workAll} →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px">
+        {projects.slice(0, 3).map((p, i) => <ProjectCard project={p} lang={lang} index={i} variant="home" />)}
+      </div>
+    </section>
+
+    <section id="about" class="wrap" style={`${sec};gap:56px`}>
+      <div class="rv" style="display:flex;flex-direction:column;gap:14px">
+        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">02 / {t.aboutLabel}</p>
+        <h2 style="margin:0;max-width:16ch;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.aboutTitle}</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:40px 64px;align-items:start">
+        <p class="rv" style="margin:0;font-size:clamp(19px,1.8vw,24px);line-height:1.55;color:#c4c4cc">{t.aboutBody}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:24px">
+          {t.cols.map((c) => (
+            <div class={`rv ${c.rvc}`} style="display:flex;flex-direction:column;gap:12px;padding-top:16px;border-top:1px solid #2a2a2f">
+              <p class="mono" style="margin:0;font-size:12px;color:var(--accent)">{c.label}</p>
+              <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.4;color:#c4c4cc">
+                {c.items.map((it) => <li>{it}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h3 class="rv" style="margin:0 0 8px;font-size:22px;font-weight:600">{t.expTitle}</h3>
+        <ol style="margin:0;padding:0;list-style:none">
+          {t.exp.map((e) => (
+            <li class="rv" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:8px 32px;padding:24px 0;border-top:1px solid #1d1d21">
+              <span class="mono" style="font-size:13px;color:var(--muted)">{e.period}</span>
+              <span style="font-size:18px;font-weight:500">{e.role}</span>
+              <span style="font-size:15px;line-height:1.5;color:#a1a1aa">{e.desc}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section id="contact" class="wrap" style="padding-block:120px 80px">
+      <div class="rv" style="display:flex;flex-direction:column;gap:28px;padding:clamp(28px,5vw,72px);border:1px solid var(--border);border-radius:20px;background:rgba(17,17,19,.78)">
+        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">03 / {t.contactLabel}</p>
+        <h2 style="margin:0;font-size:clamp(44px,7vw,112px);line-height:.95;letter-spacing:-.045em;font-weight:600">{t.contactTitle}</h2>
+        <p style="margin:0;max-width:40ch;font-size:19px;line-height:1.5;color:#b4b4bb">{t.contactBody}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <a class="btn btn-a" href="mailto:mateoarcidiacono@gmail.com">mateoarcidiacono@gmail.com</a>
+          <a class="btn btn-o" href="https://github.com/matearg" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>

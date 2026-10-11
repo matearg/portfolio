@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Projects</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5f5f4}
+a{color:#18181b}a:hover{color:#000000}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.b{font:500 14px 'Geist',sans-serif;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #d4d4d8;background:#ffffff;color:#18181b;cursor:pointer}
+.b:hover{border-color:#a1a1aa}
+.b-p{background:#18181b;border-color:#18181b;color:#ffffff}.b-p:hover{background:#3f3f46}
+.b-d{color:#b91c1c}.b-d:hover{border-color:#b91c1c}
+.b-s{min-height:36px;padding:0 12px;font-size:13px}
+.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#3f3f46}
+.in{font:400 14px 'Geist',sans-serif;min-height:40px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:8px;background:#ffffff;color:#18181b;box-sizing:border-box;width:100%}
+.in:focus{outline:2px solid #18181b;outline-offset:1px}
+textarea.in{min-height:96px;resize:vertical}
+th{font-weight:500;font-size:12px;color:#52525b;text-align:left;padding:10px 16px;border-bottom:1px solid #e4e4e7;white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid #f0f0ef;font-size:14px;white-space:nowrap}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #f5f5f4; color: #18181b; font-family: 'Geist', ui-sans-serif, sans-serif">
+
+<sc-if value="{{isLogin}}" hint-placeholder-val="{{ false }}">
+<main style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box">
+<form onSubmit="{{signIn}}" style="width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 16px; padding: 32px; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 600">Admin sign in</h1>
+<p style="margin: 0; font-size: 14px; color: #52525b">Portfolio content manager</p>
+</div>
+<label class="f" for="a-email">Email<input class="in" id="a-email" type="email" autocomplete="username" required></label>
+<label class="f" for="a-pass">Password<input class="in" id="a-pass" type="password" autocomplete="current-password" required></label>
+<button class="b b-p" type="submit">Sign in</button>
+</form>
+</main>
+</sc-if>
+
+<sc-if value="{{isApp}}" hint-placeholder-val="{{ true }}">
+<header style="background: #ffffff; border-bottom: 1px solid #e4e4e7">
+<div style="max-width: 1160px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 32px); min-height: 60px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px">
+<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600">Admin <span class="mono" style="font-size: 12px; font-weight: 400; color: #52525b; padding: 2px 8px; border: 1px solid #e4e4e7; border-radius: 6px">noindex</span></p>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-size: 13px; color: #52525b">[admin@email]</span>
+<button class="b b-s" type="button" onClick="{{signOut}}">Sign out</button>
+</div>
+</div>
+</header>
+</sc-if>
+
+<sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+<main style="max-width: 1160px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 32px) 64px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">Projects</h1>
+<p style="margin: 0; font-size: 14px; color: #52525b">{{summary}}</p>
+</div>
+<button class="b b-p" type="button" onClick="{{create}}">New project</button>
+</div>
+<div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse">
+<thead><tr><th scope="col">Order</th><th scope="col">Title</th><th scope="col">Slug</th><th scope="col">Status</th><th scope="col">Featured</th><th scope="col">Updated</th><th scope="col" style="text-align: right">Actions</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<tr>
+<td class="mono" style="color: #52525b">{{r.order}}</td>
+<td style="font-weight: 500">{{r.title}}</td>
+<td class="mono" style="color: #52525b">{{r.slug}}</td>
+<td><span style="{{r.statusStyle}}">{{r.status}}</span></td>
+<td>{{r.featuredText}}</td>
+<td style="color: #52525b">[Date]</td>
+<td style="text-align: right">
+<sc-if value="{{r.confirming}}" hint-placeholder-val="{{ false }}">
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="font-size: 13px; color: #b91c1c">Delete for good?</span><button class="b b-s b-d" type="button" onClick="{{r.remove}}">Delete</button><button class="b b-s" type="button" onClick="{{cancelDelete}}">Keep</button></span>
+</sc-if>
+<sc-if value="{{r.idle}}" hint-placeholder-val="{{ true }}">
+<span style="display: inline-flex; gap: 8px"><button class="b b-s" type="button" onClick="{{r.edit}}">Edit</button><button class="b b-s b-d" type="button" onClick="{{r.askDelete}}">Delete</button></span>
+</sc-if>
+</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{isEdit}}" hint-placeholder-val="{{ false }}">
+<main style="max-width: 820px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 32px) 64px; display: flex; flex-direction: column; gap: 20px">
+<button class="b b-s" type="button" onClick="{{cancel}}" style="align-self: flex-start">← Back to projects</button>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">{{formTitle}}</h1>
+<form onSubmit="{{save}}" style="display: flex; flex-direction: column; gap: 18px; padding: 24px; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px">
+<label class="f" for="p-title">Title<input class="in" id="p-title" type="text" required defaultValue="{{form.title}}"></label>
+<label class="f" for="p-slug">Slug<input class="in mono" id="p-slug" type="text" required pattern="[a-z0-9-]+" defaultValue="{{form.slug}}"></label>
+</div>
+<label class="f" for="p-sum-en">Summary (EN)<textarea class="in" id="p-sum-en" required></textarea></label>
+<label class="f" for="p-sum-es">Summary (ES)<textarea class="in" id="p-sum-es" required></textarea></label>
+<label class="f" for="p-tags">Tags <span style="font-weight: 400; color: #52525b">comma separated</span><input class="in" id="p-tags" type="text" defaultValue="{{form.tags}}"></label>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px">
+<label class="f" for="p-repo">Repository URL<input class="in" id="p-repo" type="url" placeholder="https://github.com/…"></label>
+<label class="f" for="p-live">Live URL<input class="in" id="p-live" type="url" placeholder="https://…"></label>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px">
+<label class="f" for="p-img">Cover image<input class="in" id="p-img" type="file" accept="image/*"></label>
+<label class="f" for="p-order">Order<input class="in" id="p-order" type="number" min="0" defaultValue="{{form.order}}"></label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 24px; padding-top: 4px">
+<label for="p-feat" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px"><input id="p-feat" type="checkbox" defaultChecked="{{form.featured}}" style="width: 18px; height: 18px">Featured</label>
+<label for="p-pub" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px"><input id="p-pub" type="checkbox" defaultChecked="{{form.published}}" style="width: 18px; height: 18px">Published</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding-top: 12px; border-top: 1px solid #f0f0ef">
+<button class="b" type="button" onClick="{{cancel}}">Cancel</button>
+<button class="b b-p" type="submit">Save project</button>
+</div>
+</form>
+</main>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  state = {
+    screen: 'list',
+    editId: null,
+    confirmId: null,
+    rows: [1, 2, 3, 4, 5, 6].map((i) => ({
+      id: i,
+      order: i,
+      title: '[Project 0' + i + ']',
+      slug: 'project-0' + i,
+      tags: i % 2 ? 'Astro, NestJS' : 'NestJS, PostgreSQL',
+      published: i !== 5,
+      featured: i === 1,
+    })),
+  };
+
+  renderVals() {
+    const { screen, rows, editId, confirmId } = this.state;
+    const go = (s, extra) => this.setState(Object.assign({ screen: s, confirmId: null }, extra));
+    const editing = rows.find((r) => r.id === editId);
+    const live = rows.filter((r) => r.published).length;
+    return {
+      isLogin: screen === 'login',
+      isApp: screen !== 'login',
+      isList: screen === 'list',
+      isEdit: screen === 'edit',
+      summary: rows.length + ' total · ' + live + ' published · ' + (rows.length - live) + ' draft',
+      signIn: (e) => { e.preventDefault(); go('list'); },
+      signOut: () => go('login'),
+      create: () => go('edit', { editId: null }),
+      cancel: () => go('list'),
+      save: (e) => { e.preventDefault(); go('list'); },
+      cancelDelete: () => this.setState({ confirmId: null }),
+      formTitle: editing ? 'Edit project' : 'New project',
+      form: editing
+        ? { title: editing.title, slug: editing.slug, tags: editing.tags, order: editing.order, featured: editing.featured, published: editing.published }
+        : { title: '', slug: '', tags: '', order: rows.length + 1, featured: false, published: false },
+      rows: rows.map((r) => ({
+        ...r,
+        status: r.published ? 'Published' : 'Draft',
+        statusStyle: r.published
+          ? 'font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; background: #18181b; color: #ffffff'
+          : 'font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; border: 1px solid #d4d4d8; color: #3f3f46',
+        featuredText: r.featured ? '★ Yes' : '—',
+        confirming: confirmId === r.id,
+        idle: confirmId !== r.id,
+        edit: () => go('edit', { editId: r.id }),
+        askDelete: () => this.setState({ confirmId: r.id }),
+        remove: () => this.setState({ rows: rows.filter((x) => x.id !== r.id), confirmId: null }),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

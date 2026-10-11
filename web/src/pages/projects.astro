@@ -1,0 +1,5 @@
+---
+import ProjectsPage from '../components/ProjectsPage.astro';
+import { getProjects } from '../lib/api';
+---
+<ProjectsPage lang="en" projects={await getProjects()} />

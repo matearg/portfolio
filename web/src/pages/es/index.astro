@@ -1,0 +1,5 @@
+---
+import Landing from '../../components/Landing.astro';
+import { getProjects } from '../../lib/api';
+---
+<Landing lang="es" projects={await getProjects()} />

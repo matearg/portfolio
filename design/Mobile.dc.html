@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mateo Arcidiacono — Landing (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0a0a0b}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 6200px; background: #0a0a0b; color: #ededee; font-family: 'Geist', ui-sans-serif, sans-serif">
+<dc-import name="Main" accent="{{accent}}" hint-size="390px,6200px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#c6ff3d","options":["#c6ff3d","#5ce1ff","#ff8a3d"]},"$preview":{"width":390,"height":6200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#c6ff3d' };
+  }
+}
+</script>
+</body>
+</html>
