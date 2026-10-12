@@ -28,7 +28,9 @@ cd api && pnpm exec prisma generate && pnpm exec prisma migrate dev && pnpm exec
 pnpm dev                                   # api :3000, web :4321
 ```
 
-Phase 1 is read-only: the API exposes `GET /projects` (published only, ordered). Admin, auth and image upload are next.
+Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `JWT_SECRET` and `CLOUDINARY_URL` in `api/.env` (see `api/.env.example`), then sign in at http://localhost:4321/admin.
+
+The API exposes `GET /projects` (published only, ordered), `POST /auth/login`, and the JWT-guarded `admin/projects` routes (CRUD plus `POST admin/projects/cover`, which uploads to Cloudinary).
 
 ## Design
 
