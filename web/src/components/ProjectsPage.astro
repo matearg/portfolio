@@ -14,7 +14,7 @@ const count = (n: number) => `${n} ${n === 1 ? t.one : t.many}`;
 const home = lang === 'es' ? '/es/' : '/';
 ---
 <Base lang={lang} page="projects">
-  <main class="wrap" style="padding-block:clamp(40px,7vw,88px) 80px;display:flex;flex-direction:column;gap:48px">
+  <main id="main" class="wrap" style="padding-block:clamp(40px,7vw,88px) 80px;display:flex;flex-direction:column;gap:48px">
     <div style="display:flex;flex-direction:column;gap:20px">
       <a class="lk" href={home} style="align-self:flex-start"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4"></path></svg>{t.back}</a>
       <h1 style="margin:0;font-size:clamp(48px,7vw,104px);line-height:.95;letter-spacing:-.045em;font-weight:600">{t.title}<span style="color:var(--accent)">.</span></h1>

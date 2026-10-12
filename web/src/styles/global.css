@@ -1,10 +1,11 @@
 :root{--bg:#0a0a0b;--text:#ededee;--muted:#8f8f98;--border:#232327;--accent:#c6ff3d}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'Geist',ui-sans-serif,sans-serif}
 a{color:var(--text)}a:hover{color:#fff}
 [hidden]{display:none!important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.skip{position:absolute;left:16px;top:-100px;z-index:40;padding:10px 16px;border-radius:8px;background:var(--accent);color:#0a0a0b;font-weight:500;text-decoration:none}
+.skip:focus{top:12px;color:#0a0a0b}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,48px)}
 .dots{background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px);background-size:28px 28px}
@@ -48,6 +49,7 @@ a{color:var(--text)}a:hover{color:#fff}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes cue{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(6px);opacity:1}}
 @media (prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
   @supports (animation-timeline:view()){
     .rv{animation:rv-in linear both;animation-timeline:view();animation-range:entry 0% cover 28%}
     .rv2{animation-range:entry 8% cover 34%}
