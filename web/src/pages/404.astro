@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import { copy, type Lang } from '../i18n';
+
+// One 404 for both locales: rendered on demand so it can read the requested path.
+const lang: Lang = /^\/es(\/|$)/.test(Astro.url.pathname) ? 'es' : 'en';
+const t = copy[lang];
+const p = lang === 'es' ? '/es' : '';
+---
+<Base lang={lang} page="404">
+  <main id="main" class="wrap" style="min-height:70vh;padding-block:clamp(40px,7vw,88px) 80px;display:flex;flex-direction:column;justify-content:center;gap:24px">
+    <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">404</p>
+    <h1 style="margin:0;font-size:clamp(48px,7vw,104px);line-height:.95;letter-spacing:-.045em;font-weight:600">{t.notFoundTitle}<span style="color:var(--accent)">.</span></h1>
+    <p style="margin:0;max-width:44ch;font-size:19px;line-height:1.5;color:#b4b4bb">{t.notFoundBody}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px">
+      <a class="btn btn-a" href={`${p}/`}>{t.back}</a>
+      <a class="btn btn-o" href={`${p}/projects`}>{t.ctaProjects}</a>
+    </div>
+  </main>
+</Base>
