@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, master]
+
+jobs:
+  # The job id is the "ci" status check that master's branch protection requires; keep them in sync.
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      # prisma.config.ts reads it; generate and build never connect.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter api exec prisma generate
+      - run: pnpm --filter api lint
+      - run: pnpm test
+      - run: pnpm build

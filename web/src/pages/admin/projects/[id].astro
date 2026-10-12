@@ -82,7 +82,9 @@ const check = 'display:inline-flex;align-items:center;gap:8px;min-height:44px;fo
       <div style={grid}>
         <label class="f" for="p-img">Cover image<input class="in" id="p-img" name="cover" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/gif" /></label>
         {project.imageUrl && (
-          <div class="f">Current cover<img src={project.imageUrl} alt="" style="max-width:160px;border-radius:8px;border:1px solid #e4e4e7" /></div>
+          <div class="f" data-cover>Current cover<img src={project.imageUrl} alt="" style="max-width:160px;border-radius:8px;border:1px solid #e4e4e7" />
+            <button class="b b-s b-d" type="button" data-remove-cover style="align-self:flex-start">Remove cover</button>
+          </div>
         )}
       </div>
       <input type="hidden" name="imageUrl" value={project.imageUrl ?? ''} />
@@ -101,3 +103,12 @@ const check = 'display:inline-flex;align-items:center;gap:8px;min-height:44px;fo
     </form>
   </main>
 </Admin>
+<script>
+  // Not a submit button: placed before Save, it would become the form's Enter-key default.
+  // Blanking the round-tripped URL makes the save send imageUrl: null.
+  document.querySelector('[data-remove-cover]')?.addEventListener('click', (e) => {
+    document.querySelector<HTMLInputElement>('input[name="imageUrl"]')!.value = '';
+    (e.currentTarget as HTMLElement).closest('[data-cover]')!.remove();
+    document.getElementById('p-img')!.focus();
+  });
+</script>
