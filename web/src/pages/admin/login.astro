@@ -1,0 +1,38 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { adminFetch, ApiError } from '../../lib/api';
+
+let error = '';
+let email = '';
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  email = String(form.get('email') ?? '');
+  try {
+    const { token } = await adminFetch<{ token: string }>(undefined, '/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password: String(form.get('password') ?? '') }),
+    });
+    // Same lifetime as the JWT the API issues.
+    Astro.cookies.set('admin', token, { path: '/admin', httpOnly: true, sameSite: 'strict', secure: import.meta.env.PROD, maxAge: 7 * 24 * 3600 });
+    return Astro.redirect('/admin');
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+    error = e.message;
+  }
+}
+---
+<Admin title="Sign in" header={false}>
+  <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px">
+    <form method="post" style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px;padding:32px;background:#fff;border:1px solid #e4e4e7;border-radius:12px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h1 style="margin:0;font-size:20px;font-weight:600">Admin sign in</h1>
+        <p style="margin:0;font-size:14px;color:#52525b">Portfolio content manager</p>
+      </div>
+      {error && <p class="err" role="alert">{error}</p>}
+      <label class="f" for="a-email">Email<input class="in" id="a-email" name="email" type="email" autocomplete="username" required value={email} /></label>
+      <label class="f" for="a-pass">Password<input class="in" id="a-pass" name="password" type="password" autocomplete="current-password" required /></label>
+      <button class="b b-p" type="submit">Sign in</button>
+    </form>
+  </main>
+</Admin>

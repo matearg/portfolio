@@ -1,0 +1,103 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import { adminFetch, ApiError, type Project } from '../../../lib/api';
+
+const token = Astro.cookies.get('admin')?.value;
+const isNew = Astro.params.id === 'new';
+const id = Number(Astro.params.id);
+if (!isNew && !Number.isInteger(id)) return Astro.redirect('/admin');
+
+type Form = Omit<Project, 'id' | 'updatedAt'>;
+let project: Form;
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  const f = await Astro.request.formData();
+  const str = (k: string) => String(f.get(k) ?? '').trim();
+  const data: Partial<Form> = {
+    title: str('title'),
+    slug: str('slug'),
+    summaryEn: str('summaryEn'),
+    summaryEs: str('summaryEs'),
+    tags: str('tags').split(',').map((t) => t.trim()).filter(Boolean),
+    repoUrl: str('repoUrl') || null,
+    liveUrl: str('liveUrl') || null,
+    // Round-trips the current cover so a failed save keeps an already-uploaded image.
+    imageUrl: str('imageUrl') || null,
+    year: str('year') ? Number(str('year')) : null,
+    order: Number(str('order') || 0),
+    featured: f.has('featured'),
+    published: f.has('published'),
+  };
+  try {
+    const cover = f.get('cover');
+    // An empty file input still submits a zero-byte File.
+    if (cover instanceof File && cover.size > 0) {
+      const body = new FormData();
+      body.append('file', cover);
+      data.imageUrl = (await adminFetch<{ url: string }>(token, '/admin/projects/cover', { method: 'POST', body })).url;
+    }
+    await adminFetch(token, isNew ? '/admin/projects' : `/admin/projects/${id}`, {
+      method: isNew ? 'POST' : 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return Astro.redirect('/admin');
+  } catch (e) {
+    if (!(e instanceof ApiError) || e.status === 401) throw e;
+    error = e.message;
+    project = data as Form;
+  }
+} else if (isNew) {
+  const rows = await adminFetch<Project[]>(token, '/admin/projects');
+  project = { title: '', slug: '', summaryEn: '', summaryEs: '', tags: [], repoUrl: null, liveUrl: null, imageUrl: null, year: new Date().getFullYear(), featured: false, published: false, order: Math.max(0, ...rows.map((r) => r.order)) + 1 };
+} else {
+  try {
+    project = await adminFetch<Project>(token, `/admin/projects/${id}`);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return Astro.redirect('/admin');
+    throw e;
+  }
+}
+const grid = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px';
+const check = 'display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:14px';
+---
+<Admin title={isNew ? 'New project' : 'Edit project'}>
+  <main class="wrap" style="max-width:820px;padding-block:32px 64px;display:flex;flex-direction:column;gap:20px">
+    <a class="b b-s" href="/admin" style="align-self:flex-start">← Back to projects</a>
+    <h1 style="margin:0;font-size:24px;font-weight:600">{isNew ? 'New project' : 'Edit project'}</h1>
+    <form method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:18px;padding:24px;background:#fff;border:1px solid #e4e4e7;border-radius:12px">
+      {error && <p class="err" role="alert">{error}</p>}
+      <div style={grid}>
+        <label class="f" for="p-title">Title<input class="in" id="p-title" name="title" type="text" required value={project.title} /></label>
+        <label class="f" for="p-slug">Slug<input class="in mono" id="p-slug" name="slug" type="text" required pattern="[a-z0-9-]+" title="Lowercase letters, numbers and dashes" value={project.slug} /></label>
+      </div>
+      <label class="f" for="p-sum-en">Summary (EN)<textarea class="in" id="p-sum-en" name="summaryEn" required>{project.summaryEn}</textarea></label>
+      <label class="f" for="p-sum-es">Summary (ES)<textarea class="in" id="p-sum-es" name="summaryEs" required>{project.summaryEs}</textarea></label>
+      <label class="f" for="p-tags">Tags <span style="font-weight:400;color:#52525b">comma separated</span><input class="in" id="p-tags" name="tags" type="text" value={project.tags.join(', ')} /></label>
+      <div style={grid}>
+        <label class="f" for="p-repo">Repository URL<input class="in" id="p-repo" name="repoUrl" type="url" placeholder="https://github.com/…" value={project.repoUrl ?? ''} /></label>
+        <label class="f" for="p-live">Live URL<input class="in" id="p-live" name="liveUrl" type="url" placeholder="https://…" value={project.liveUrl ?? ''} /></label>
+      </div>
+      <div style={grid}>
+        <label class="f" for="p-img">Cover image<input class="in" id="p-img" name="cover" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/gif" /></label>
+        {project.imageUrl && (
+          <div class="f">Current cover<img src={project.imageUrl} alt="" style="max-width:160px;border-radius:8px;border:1px solid #e4e4e7" /></div>
+        )}
+      </div>
+      <input type="hidden" name="imageUrl" value={project.imageUrl ?? ''} />
+      <div style={grid}>
+        <label class="f" for="p-year">Year<input class="in" id="p-year" name="year" type="number" min="1990" max="2100" value={project.year ?? ''} /></label>
+        <label class="f" for="p-order">Order<input class="in" id="p-order" name="order" type="number" min="0" required value={project.order} /></label>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:24px;padding-top:4px">
+        <label for="p-feat" style={check}><input id="p-feat" name="featured" type="checkbox" checked={project.featured} style="width:18px;height:18px" />Featured</label>
+        <label for="p-pub" style={check}><input id="p-pub" name="published" type="checkbox" checked={project.published} style="width:18px;height:18px" />Published</label>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid #f0f0ef">
+        <a class="b" href="/admin">Cancel</a>
+        <button class="b b-p" type="submit">Save project</button>
+      </div>
+    </form>
+  </main>
+</Admin>

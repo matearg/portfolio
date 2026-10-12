@@ -1,0 +1,66 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { adminFetch, type Project } from '../../lib/api';
+
+const token = Astro.cookies.get('admin')?.value;
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (form.get('_action') === 'delete') {
+    await adminFetch(token, `/admin/projects/${Number(form.get('id'))}`, { method: 'DELETE' });
+  }
+  return Astro.redirect('/admin');
+}
+const rows = await adminFetch<Project[]>(token, '/admin/projects');
+const live = rows.filter((r) => r.published).length;
+const pill = 'font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;';
+const date = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+---
+<Admin title="Projects">
+  <main class="wrap" style="max-width:1160px;padding-block:32px 64px;display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h1 style="margin:0;font-size:24px;font-weight:600">Projects</h1>
+        <p style="margin:0;font-size:14px;color:#52525b">{rows.length} total · {live} published · {rows.length - live} draft</p>
+      </div>
+      <a class="b b-p" href="/admin/projects/new">New project</a>
+    </div>
+    <div style="background:#fff;border:1px solid #e4e4e7;border-radius:12px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr><th scope="col">Order</th><th scope="col">Title</th><th scope="col">Slug</th><th scope="col">Status</th><th scope="col">Featured</th><th scope="col">Updated</th><th scope="col" style="text-align:right">Actions</th></tr></thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr>
+              <td class="mono" style="color:#52525b">{r.order}</td>
+              <td style="font-weight:500">{r.title}</td>
+              <td class="mono" style="color:#52525b">{r.slug}</td>
+              <td><span style={pill + (r.published ? 'background:#18181b;color:#fff' : 'border:1px solid #d4d4d8;color:#3f3f46')}>{r.published ? 'Published' : 'Draft'}</span></td>
+              <td>{r.featured ? '★ Yes' : '—'}</td>
+              <td style="color:#52525b">{date.format(new Date(r.updatedAt))}</td>
+              <td style="text-align:right">
+                <span data-idle style="display:inline-flex;gap:8px"><a class="b b-s" href={`/admin/projects/${r.id}`}>Edit</a><button class="b b-s b-d" type="button" data-ask>Delete</button></span>
+                <form method="post" data-confirm hidden style="display:inline-flex;align-items:center;gap:8px">
+                  <input type="hidden" name="_action" value="delete" />
+                  <input type="hidden" name="id" value={r.id} />
+                  <span style="font-size:13px;color:#b91c1c">Delete for good?</span><button class="b b-s b-d" type="submit">Delete</button><button class="b b-s" type="button" data-keep>Keep</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</Admin>
+
+<script>
+  // Inline delete confirmation: swap the row's actions for a confirm form and back.
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element).closest('[data-ask],[data-keep]');
+    if (!btn) return;
+    const cell = btn.closest('td')!;
+    const asking = btn.hasAttribute('data-ask');
+    cell.querySelector<HTMLElement>('[data-idle]')!.hidden = asking;
+    cell.querySelector<HTMLElement>('[data-confirm]')!.hidden = !asking;
+    cell.querySelector<HTMLElement>(asking ? '[data-keep]' : '[data-ask]')!.focus();
+  });
+</script>

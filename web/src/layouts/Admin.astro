@@ -1,0 +1,58 @@
+---
+// Light admin theme ported from design/Admin.dc.html; deliberately not using global.css.
+interface Props { title: string; header?: boolean; }
+const { title, header = true } = Astro.props;
+const token = Astro.cookies.get('admin')?.value;
+let email = '';
+try {
+  // Display only; the API verifies the token on every call.
+  email = JSON.parse(Buffer.from(token!.split('.')[1], 'base64url').toString()).sub;
+} catch {}
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title} — Admin</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style is:global>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#f5f5f4;color:#18181b;font-family:'Geist',ui-sans-serif,sans-serif}
+    a{color:#18181b}a:hover{color:#000}
+    [hidden]{display:none!important}
+    .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+    .wrap{margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+    .b{font:500 14px 'Geist',sans-serif;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid #d4d4d8;background:#fff;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+    .b:hover{border-color:#a1a1aa}
+    .b-p{background:#18181b;border-color:#18181b;color:#fff}.b-p:hover{background:#3f3f46;color:#fff}
+    .b-d{color:#b91c1c}.b-d:hover{border-color:#b91c1c}
+    .b-s{min-height:36px;padding:0 12px;font-size:13px}
+    .f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#3f3f46}
+    .in{font:400 14px 'Geist',sans-serif;min-height:40px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:8px;background:#fff;color:#18181b;width:100%}
+    .in:focus{outline:2px solid #18181b;outline-offset:1px}
+    textarea.in{min-height:96px;resize:vertical}
+    .err{margin:0;padding:10px 14px;border:1px solid #fecaca;border-radius:8px;background:#fef2f2;color:#b91c1c;font-size:14px}
+    th{font-weight:500;font-size:12px;color:#52525b;text-align:left;padding:10px 16px;border-bottom:1px solid #e4e4e7;white-space:nowrap}
+    td{padding:12px 16px;border-bottom:1px solid #f0f0ef;font-size:14px;white-space:nowrap}
+  </style>
+</head>
+<body>
+  {header && (
+    <header style="background:#fff;border-bottom:1px solid #e4e4e7">
+      <div class="wrap" style="max-width:1160px;min-height:60px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px">
+        <p style="margin:0;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600"><a href="/admin" style="text-decoration:none">Admin</a> <span class="mono" style="font-size:12px;font-weight:400;color:#52525b;padding:2px 8px;border:1px solid #e4e4e7;border-radius:6px">noindex</span></p>
+        <form method="post" action="/admin/logout" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:13px;color:#52525b">{email}</span>
+          <button class="b b-s" type="submit">Sign out</button>
+        </form>
+      </div>
+    </header>
+  )}
+  <slot />
+</body>
+</html>

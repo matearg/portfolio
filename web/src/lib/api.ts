@@ -11,16 +11,39 @@ export interface Project {
   year: number | null;
   featured: boolean;
   order: number;
+  published: boolean;
+  updatedAt: string;
 }
+
+const API = import.meta.env.API_URL ?? 'http://localhost:3000';
 
 // An API outage degrades to the empty state instead of a 500.
 export async function getProjects(): Promise<Project[]> {
   try {
-    const res = await fetch(`${import.meta.env.API_URL ?? 'http://localhost:3000'}/projects`);
+    const res = await fetch(`${API}/projects`);
     if (!res.ok) throw new Error(`API responded ${res.status}`);
     return await res.json();
   } catch (err) {
     console.error('getProjects failed:', err);
     return [];
   }
+}
+
+export class ApiError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
+}
+
+// Admin calls surface failures (unlike getProjects) so the admin sees what went wrong.
+export async function adminFetch<T = unknown>(token: string | undefined, path: string, init: RequestInit = {}): Promise<T> {
+  const headers = new Headers(init.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  const res = await fetch(`${API}${path}`, { ...init, headers });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const msg = Array.isArray(body.message) ? body.message.join(', ') : body.message;
+    throw new ApiError(res.status, msg ?? `API responded ${res.status}`);
+  }
+  return res.status === 204 ? (undefined as T) : res.json();
 }
