@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -16,7 +17,11 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminGuard } from '../auth/admin.guard.js';
 import { CloudinaryService } from './cloudinary.service.js';
-import { CreateProjectDto, UpdateProjectDto } from './project.dto.js';
+import {
+  CreateProjectDto,
+  ReorderProjectsDto,
+  UpdateProjectDto,
+} from './project.dto.js';
 import { ProjectsService } from './projects.service.js';
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -48,6 +53,13 @@ export class AdminProjectsController {
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProjectDto) {
     return this.projects.update(id, dto);
+  }
+
+  // PUT, not PATCH, so it never collides with PATCH :id.
+  @Put('order')
+  @HttpCode(204)
+  reorder(@Body() dto: ReorderProjectsDto) {
+    return this.projects.reorder(dto.ids);
   }
 
   @Delete(':id')
