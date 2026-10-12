@@ -6,7 +6,7 @@ const t = copy[lang];
 const projects = lang === 'es' ? '/es/projects' : '/projects';
 ---
 <canvas id="bg" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
-<section id="hero" aria-label="Intro" class="wrap" style="padding-block:clamp(40px,7vw,88px) 48px;min-height:780px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr));align-items:center;gap:24px 40px">
+<section id="hero" aria-label={t.introLabel} class="wrap" style="padding-block:clamp(40px,7vw,88px) 48px;min-height:780px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr));align-items:center;gap:24px 40px">
   <div style="display:flex;flex-direction:column;gap:28px">
     <p class="mono" style="margin:0;display:flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.04em;color:var(--muted)"><span aria-hidden="true" style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block"></span>{t.role} · Mar del Plata, Argentina</p>
     <h1 style="margin:0;font-size:clamp(48px,8.4vw,128px);line-height:.92;letter-spacing:-.045em;font-weight:600">Mateo<br />Arcidiacono<span style="color:var(--accent)">.</span></h1>
@@ -17,7 +17,7 @@ const projects = lang === 'es' ? '/es/projects' : '/projects';
     </div>
   </div>
   <div style="position:relative;width:100%;max-width:600px;aspect-ratio:1/1;justify-self:center">
-    <canvas id="ico" role="img" aria-label="Wireframe geodesic sphere that morphs, follows the cursor and turns with scroll" style="display:block;width:100%;height:100%"></canvas>
+    <canvas id="ico" role="img" aria-label={t.sphereLabel} style="display:block;width:100%;height:100%"></canvas>
     <span class="mono" aria-hidden="true" style="position:absolute;top:8px;left:8px;font-size:11px;color:#6b6b74">fig.01 — icosphere / 42v · 120e</span>
     <span class="mono" aria-hidden="true" style="position:absolute;bottom:8px;right:8px;font-size:11px;color:#6b6b74">{t.hint}</span>
   </div>
