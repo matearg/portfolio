@@ -12,10 +12,10 @@ const loop = [...stack, ...stack, ...stack, ...stack]; // four copies so the -50
 const sec = 'padding-block:120px 40px;display:flex;flex-direction:column';
 ---
 <Base lang={lang} page="home">
-  <main style="overflow-x:clip">
+  <main id="main" style="overflow-x:clip">
     <Hero lang={lang} />
 
-    <section aria-label="Stack" style="border-block:1px solid #1d1d21;background:rgba(10,10,11,.6);overflow:hidden">
+    <section aria-label={t.stackLabel} style="border-block:1px solid #1d1d21;background:rgba(10,10,11,.6);overflow:hidden">
       <div class="marquee" style="display:flex;width:max-content">
         {loop.map((s, i) => (
           <span class="mono" aria-hidden={i >= stack.length ? 'true' : undefined} style="display:inline-flex;align-items:center;gap:28px;padding:22px 0 22px 28px;font-size:15px;color:#d4d4d8;white-space:nowrap">{s}<span aria-hidden="true" style="width:6px;height:6px;background:var(--accent);transform:rotate(45deg);display:inline-block"></span></span>

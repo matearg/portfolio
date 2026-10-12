@@ -2,41 +2,75 @@
 import '../styles/global.css';
 import { copy, type Lang } from '../i18n';
 
-interface Props { lang: Lang; page: 'home' | 'projects'; }
+interface Props { lang: Lang; page: 'home' | 'projects' | '404'; }
 const { lang, page } = Astro.props;
 const t = copy[lang];
 const p = lang === 'es' ? '/es' : '';
-const alt = (l: Lang) => (l === 'es' ? '/es' : '') + (page === 'home' ? '/' : '/projects');
+const alt = (l: Lang) => (l === 'es' ? '/es' : '') + (page === 'projects' ? '/projects' : '/');
 const links: [string, string][] = page === 'home'
   ? [['#work', t.navWork], ['#about', t.navAbout], [`${p}/projects`, t.navProjects], ['#contact', t.navContact]]
   : [[`${p}/`, t.navHome], [`${p}/projects`, t.navProjects], [`${p}/#contact`, t.navContact]];
 const home = `${p}/`;
+const abs = (path: string) => new URL(path, Astro.site).href;
+const title = { home: t.metaHome, projects: t.metaProjects, '404': t.meta404 }[page];
+const desc = page === 'projects' ? t.metaDescProjects : t.metaDesc;
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Mateo Arcidiacono',
+  jobTitle: t.role,
+  url: abs(home),
+  email: 'mailto:mateoarcidiacono@gmail.com',
+  sameAs: ['https://github.com/matearg'],
+  address: { '@type': 'PostalAddress', addressLocality: 'Mar del Plata', addressCountry: 'AR' },
+};
 ---
 <!doctype html>
 <html lang={lang}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{page === 'home' ? t.metaHome : t.metaProjects}</title>
-  <meta name="description" content={t.metaDesc} />
-  <link rel="alternate" hreflang="en" href={alt('en')} />
-  <link rel="alternate" hreflang="es" href={alt('es')} />
+  <title>{title}</title>
+  <meta name="description" content={desc} />
+  <meta name="theme-color" content="#0a0a0b" />
+  {page !== '404' && <>
+    <link rel="canonical" href={abs(alt(lang))} />
+    <link rel="alternate" hreflang="en" href={abs(alt('en'))} />
+    <link rel="alternate" hreflang="es" href={abs(alt('es'))} />
+    <link rel="alternate" hreflang="x-default" href={abs(alt('en'))} />
+  </>}
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mateo Arcidiacono" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={desc} />
+  {page !== '404' && <meta property="og:url" content={abs(alt(lang))} />}
+  <meta property="og:locale" content={lang === 'es' ? 'es_AR' : 'en_US'} />
+  <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_AR'} />
+  <meta property="og:image" content={abs('/og.png')} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={`Mateo Arcidiacono — ${t.role}`} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json" set:html={JSON.stringify(person)} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
-<body class={page === 'projects' ? 'dots' : undefined}>
+<body class={page === 'home' ? undefined : 'dots'}>
+  <a class="skip" href="#main">{t.skip}</a>
   <div class="progress" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:2px;background:var(--accent);transform-origin:0 50%;z-index:30"></div>
   <div style="position:relative;z-index:1">
     <header style="position:sticky;top:0;z-index:20;background:rgba(10,10,11,.8);backdrop-filter:blur(14px);border-bottom:1px solid #1d1d21">
-      <nav aria-label="Main" class="wrap" style="min-height:68px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px">
+      <nav aria-label={t.navLabel} class="wrap" style="min-height:68px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px">
         <a href={home} class="mono" style="display:inline-flex;align-items:center;gap:10px;min-height:44px;font-size:14px;font-weight:500;text-decoration:none"><span aria-hidden="true" style="width:10px;height:10px;background:var(--accent);display:inline-block"></span>mateo.arcidiacono</a>
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0 22px">
           {links.map(([h, label]) => <a class="nl" href={h} aria-current={page === 'projects' && h === `${p}/projects` ? 'page' : undefined}>{label}</a>)}
-          <div role="group" aria-label="Language" style="display:flex;gap:2px;border:1px solid #2a2a2f;border-radius:999px;padding:3px">
-            <a class="lt" href={alt('en')} hreflang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
-            <a class="lt" href={alt('es')} hreflang="es" aria-current={lang === 'es' ? 'true' : undefined}>ES</a>
+          <div role="group" aria-label={t.langLabel} style="display:flex;gap:2px;border:1px solid #2a2a2f;border-radius:999px;padding:3px">
+            <a class="lt" href={alt('en')} hreflang="en" lang="en" aria-label="English" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+            <a class="lt" href={alt('es')} hreflang="es" lang="es" aria-label="Español" aria-current={lang === 'es' ? 'true' : undefined}>ES</a>
           </div>
         </div>
       </nav>
