@@ -1,5 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import {
+  ArrayNotEmpty,
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsInt,
@@ -32,3 +34,8 @@ export class CreateProjectDto {
 }
 
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {}
+
+export class ReorderProjectsDto {
+  @IsArray() @ArrayNotEmpty() @ArrayUnique() @IsInt({ each: true })
+  ids: number[];
+}

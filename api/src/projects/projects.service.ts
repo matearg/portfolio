@@ -45,6 +45,19 @@ export class ProjectsService {
     return this.prisma.project.update({ where: { id }, data }).catch(rethrow);
   }
 
+  // Renumbers the given ids 1..n in one transaction. Rows already in place are
+  // skipped so their updatedAt stays put; unknown ids are a no-op.
+  async reorder(ids: number[]) {
+    await this.prisma.$transaction(
+      ids.map((id, i) =>
+        this.prisma.project.updateMany({
+          where: { id, order: { not: i + 1 } },
+          data: { order: i + 1 },
+        }),
+      ),
+    );
+  }
+
   async remove(id: number) {
     await this.prisma.project.delete({ where: { id } }).catch(rethrow);
   }
