@@ -7,6 +7,14 @@ if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   if (form.get('_action') === 'delete') {
     await adminFetch(token, `/admin/projects/${Number(form.get('id'))}`, { method: 'DELETE' });
+  } else if (form.get('_action') === 'reorder') {
+    await adminFetch(token, '/admin/projects/order', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ids: form.getAll('ids').map(Number) }),
+    });
+    // Lands focus back on the moved row's handle after the reload.
+    return Astro.redirect(`/admin#drag-${Number(form.get('moved'))}`);
   }
   return Astro.redirect('/admin');
 }
@@ -14,6 +22,7 @@ const rows = await adminFetch<Project[]>(token, '/admin/projects');
 const live = rows.filter((r) => r.published).length;
 const pill = 'font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;';
 const date = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
+const handle = 'font-size:16px;line-height:1;width:32px;height:32px;margin-right:4px;border:0;border-radius:6px;background:none;color:#a1a1aa;cursor:grab;vertical-align:middle';
 ---
 <Admin title="Projects">
   <main class="wrap" style="max-width:1160px;padding-block:32px 64px;display:flex;flex-direction:column;gap:20px">
@@ -30,7 +39,10 @@ const date = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
         <tbody>
           {rows.map((r) => (
             <tr>
-              <td class="mono" style="color:#52525b">{r.order}</td>
+              <td class="mono" style="color:#52525b">
+                <button type="button" id={`drag-${r.id}`} draggable="true" style={handle} aria-label={`Reorder ${r.title}: drag, or press Arrow Up or Down`} data-drag>⠿</button>{r.order}
+                <input type="hidden" name="ids" value={r.id} form="reorder" />
+              </td>
               <td style="font-weight:500">{r.title}</td>
               <td class="mono" style="color:#52525b">{r.slug}</td>
               <td><span style={pill + (r.published ? 'background:#18181b;color:#fff' : 'border:1px solid #d4d4d8;color:#3f3f46')}>{r.published ? 'Published' : 'Draft'}</span></td>
@@ -49,6 +61,7 @@ const date = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
         </tbody>
       </table>
     </div>
+    <form id="reorder" method="post" hidden><input type="hidden" name="_action" value="reorder" /><input type="hidden" name="moved" /></form>
   </main>
 </Admin>
 
@@ -63,4 +76,57 @@ const date = new Intl.DateTimeFormat('en', { dateStyle: 'medium' });
     cell.querySelector<HTMLElement>('[data-confirm]')!.hidden = !asking;
     cell.querySelector<HTMLElement>(asking ? '[data-keep]' : '[data-ask]')!.focus();
   });
+
+  // Reorder: move rows in the DOM, then post every row's id in table order (the
+  // hidden `ids` inputs belong to #reorder). The Order field on the edit page stays the fallback.
+  const tbody = document.querySelector('tbody')!;
+  const form = document.querySelector<HTMLFormElement>('#reorder')!;
+  const save = (row: Element) => {
+    form.moved.value = row.querySelector<HTMLInputElement>('[name=ids]')!.value;
+    form.requestSubmit();
+  };
+  let dragged: HTMLTableRowElement | null = null;
+  let home: Element | null = null;
+  tbody.addEventListener('dragstart', (e) => {
+    // Only the handle starts a reorder; the Edit link is natively draggable too.
+    if (!(e.target instanceof Element && e.target.closest('[data-drag]'))) return;
+    dragged = e.target.closest('tr')!;
+    home = dragged.nextElementSibling;
+    dragged.style.opacity = '.5';
+    e.dataTransfer!.effectAllowed = 'move';
+    e.dataTransfer!.setData('text/plain', ''); // Firefox won't start a drag without data.
+    e.dataTransfer!.setDragImage(dragged, 16, 16);
+  });
+  tbody.addEventListener('dragover', (e) => {
+    if (!dragged) return;
+    e.preventDefault();
+    const row = (e.target as Element).closest?.('tr');
+    if (!row || row === dragged) return;
+    const { top, height } = row.getBoundingClientRect();
+    row[e.clientY < top + height / 2 ? 'before' : 'after'](dragged);
+  });
+  tbody.addEventListener('drop', (e) => {
+    if (!dragged) return;
+    e.preventDefault();
+    if (dragged.nextElementSibling !== home) save(dragged);
+    home = dragged.nextElementSibling;
+  });
+  tbody.addEventListener('dragend', () => {
+    if (!dragged) return;
+    dragged.style.opacity = '';
+    // No-op after a drop; after a cancel (Esc, dropped outside) it puts the row back.
+    tbody.insertBefore(dragged, home);
+    dragged = null;
+  });
+  tbody.addEventListener('keydown', (e) => {
+    const btn = (e.target as Element).closest('[data-drag]');
+    if (!btn || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+    e.preventDefault();
+    const row = btn.closest('tr')!;
+    const next = e.key === 'ArrowUp' ? row.previousElementSibling : row.nextElementSibling;
+    if (!next) return;
+    next[e.key === 'ArrowUp' ? 'before' : 'after'](row);
+    save(row);
+  });
+  document.getElementById(location.hash.slice(1))?.focus();
 </script>
