@@ -63,10 +63,11 @@ const person = {
   <a class="skip" href="#main">{t.skip}</a>
   <div class="progress" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:2px;background:var(--accent);transform-origin:0 50%;z-index:30"></div>
   <div style="position:relative;z-index:1">
-    <header style="position:sticky;top:0;z-index:20;background:rgba(10,10,11,.8);backdrop-filter:blur(14px);border-bottom:1px solid #1d1d21">
+    <header class="hdr">
       <nav aria-label={t.navLabel} class="wrap" style="min-height:68px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px">
-        <a href={home} class="mono" style="display:inline-flex;align-items:center;gap:10px;min-height:44px;font-size:14px;font-weight:500;text-decoration:none"><span aria-hidden="true" style="width:10px;height:10px;background:var(--accent);display:inline-block"></span>mateo.arcidiacono</a>
-        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0 22px">
+        <a href={home} class="mono logo" style="display:inline-flex;align-items:center;gap:10px;min-height:44px;font-size:14px;font-weight:500;text-decoration:none"><span aria-hidden="true" style="width:10px;height:10px;background:var(--accent);display:inline-block"></span>mateo.arcidiacono</a>
+        <button type="button" class="burger" aria-expanded="false" aria-controls="menu" aria-label={t.menu}><span></span><span></span></button>
+        <div id="menu" class="menu">
           {links.map(([h, label]) => <a class="nl" href={h} aria-current={page === 'projects' && h === `${p}/projects` ? 'page' : undefined}>{label}</a>)}
           <div role="group" aria-label={t.langLabel} style="display:flex;gap:2px;border:1px solid #2a2a2f;border-radius:999px;padding:3px">
             <a class="lt" href={alt('en')} hreflang="en" lang="en" aria-label="English" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
@@ -81,5 +82,20 @@ const person = {
       <span>{t.built}</span>
     </footer>
   </div>
+  <script>
+    const btn = document.querySelector<HTMLButtonElement>('.burger')!;
+    const header = btn.closest('header')!;
+    const isOpen = () => btn.getAttribute('aria-expanded') === 'true';
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('nav-open', open);
+      // Keep focus inside the fullscreen menu: everything behind it is covered anyway.
+      for (const el of header.parentElement!.children) if (el !== header) (el as HTMLElement).inert = open;
+    };
+    btn.addEventListener('click', () => set(!isOpen()));
+    document.getElementById('menu')!.addEventListener('click', (e) => { if ((e.target as Element).closest('a')) set(false); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { set(false); btn.focus(); } });
+    matchMedia('(max-width:720px) and (scripting:enabled)').addEventListener('change', () => set(false));
+  </script>
 </body>
 </html>

@@ -9,6 +9,25 @@ a{color:var(--text)}a:hover{color:#fff}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 .wrap{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,48px)}
 .dots{background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px);background-size:28px 28px}
+.hdr{position:sticky;top:0;z-index:20;background:rgba(10,10,11,.8);border-bottom:1px solid #1d1d21}
+/* blur on a pseudo: backdrop-filter on .hdr itself would trap the fixed mobile menu inside the bar */
+.hdr::before{content:'';position:absolute;inset:0;z-index:-1;backdrop-filter:blur(14px)}
+.menu{display:flex;flex-wrap:wrap;align-items:center;gap:0 22px}
+.burger{display:none}
+@media (max-width:720px) and (scripting:enabled){
+  .logo,.burger{position:relative;z-index:1}
+  .burger{display:inline-flex;flex-direction:column;justify-content:center;gap:6px;width:44px;height:44px;padding:0 11px;margin-right:-11px;background:none;border:0;cursor:pointer}
+  .burger span{display:block;height:2px;background:var(--text);transition:transform .25s}
+  .burger[aria-expanded=true] span:first-child{transform:translateY(4px) rotate(45deg)}
+  .burger[aria-expanded=true] span:last-child{transform:translateY(-4px) rotate(-45deg)}
+  /* visibility (not display) so it can fade, and stays out of the tab order while closed */
+  .menu{position:fixed;inset:0;flex-direction:column;flex-wrap:nowrap;align-items:flex-start;justify-content:center;gap:4px;padding:88px clamp(16px,4vw,48px) 40px;background:var(--bg);visibility:hidden;opacity:0;transition:opacity .25s,visibility .25s}
+  .menu .nl{font-size:36px;font-weight:500;letter-spacing:-.02em;min-height:56px}
+  .menu [role=group]{margin-top:32px}
+  .nav-open{overflow:hidden}
+  .nav-open .menu{visibility:visible;opacity:1}
+}
+@media (prefers-reduced-motion:reduce){.menu,.burger span{transition:none}}
 .nl{color:#a1a1aa;text-decoration:none;font-size:14px;min-height:44px;display:inline-flex;align-items:center}
 .nl:hover,.nl[aria-current]{color:var(--text)}
 .lt{font:500 12px 'JetBrains Mono',monospace;min-width:44px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;color:#a1a1aa;text-decoration:none}
