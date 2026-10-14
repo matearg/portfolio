@@ -30,6 +30,8 @@ pnpm dev                                   # api :3000, web :4321
 
 Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `JWT_SECRET` and `CLOUDINARY_URL` in `api/.env` (see `api/.env.example`), then sign in at http://localhost:4321/admin.
 
+The landing's GitHub activity section needs `GITHUB_TOKEN` in `api/.env` (a fine-grained token with public read-only access); without it the section is hidden.
+
 The API exposes `GET /projects` (published only, ordered), `POST /auth/login`, and the JWT-guarded `admin/projects` routes (CRUD plus `POST admin/projects/cover`, which uploads to Cloudinary).
 
 ## Design
