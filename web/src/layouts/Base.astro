@@ -2,13 +2,14 @@
 import '../styles/global.css';
 import { copy, type Lang } from '../i18n';
 
-interface Props { lang: Lang; page: 'home' | 'projects' | '404'; }
-const { lang, page } = Astro.props;
+// activity: the landing only links its Activity section when it rendered.
+interface Props { lang: Lang; page: 'home' | 'projects' | '404'; activity?: boolean; }
+const { lang, page, activity = false } = Astro.props;
 const t = copy[lang];
 const p = lang === 'es' ? '/es' : '';
 const alt = (l: Lang) => (l === 'es' ? '/es' : '') + (page === 'projects' ? '/projects' : '/');
 const links: [string, string][] = page === 'home'
-  ? [['#work', t.navWork], ['#about', t.navAbout], [`${p}/projects`, t.navProjects], ['#contact', t.navContact]]
+  ? [['#work', t.navWork], ...(activity ? [['#activity', t.navActivity] as [string, string]] : []), ['#about', t.navAbout], [`${p}/projects`, t.navProjects], ['#contact', t.navContact]]
   : [[`${p}/`, t.navHome], [`${p}/projects`, t.navProjects], [`${p}/#contact`, t.navContact]];
 const home = `${p}/`;
 const abs = (path: string) => new URL(path, Astro.site).href;
