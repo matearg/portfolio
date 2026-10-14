@@ -3,15 +3,26 @@ import Base from '../layouts/Base.astro';
 import Hero from './Hero.astro';
 import ProjectCard from './ProjectCard.astro';
 import { copy, stack, type Lang } from '../i18n';
-import type { Project } from '../lib/api';
+import type { Contributions, Project } from '../lib/api';
 
-interface Props { lang: Lang; projects: Project[]; }
-const { lang, projects } = Astro.props;
+interface Props { lang: Lang; projects: Project[]; activity: Contributions | null; }
+const { lang, projects, activity } = Astro.props;
 const t = copy[lang];
 const loop = [...stack, ...stack, ...stack, ...stack]; // four copies so the -50% marquee never shows a gap at 1440px
 const sec = 'padding-block:120px 40px;display:flex;flex-direction:column';
+// Sections after Work shift by one when the activity section is shown.
+const num = (i: number) => String(i + (activity ? 1 : 0)).padStart(2, '0');
+const fmt = (n: number) => n.toLocaleString(lang);
+// Calendar rows run Sunday..Saturday, so pad the first, partial week.
+const pad = activity?.days.length ? new Date(activity.days[0].date).getUTCDay() : 0;
+const stats = activity ? [
+  [fmt(activity.total), t.activityTotal],
+  [fmt(activity.commits), t.activityCommits],
+  [fmt(activity.pullRequests), t.activityPrs],
+  [`${activity.longestStreak}${t.activityDays}`, t.activityStreak],
+] : [];
 ---
-<Base lang={lang} page="home">
+<Base lang={lang} page="home" activity={!!activity}>
   <main id="main" style="overflow-x:clip">
     <Hero lang={lang} />
 
@@ -36,9 +47,41 @@ const sec = 'padding-block:120px 40px;display:flex;flex-direction:column';
       </div>
     </section>
 
+    {activity && (
+      <section id="activity" class="wrap" style={`${sec};gap:40px`}>
+        <div class="rv" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">02 / {t.activityLabel}</p>
+            <h2 style="margin:0;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.activityTitle}</h2>
+          </div>
+          <a class="ul" href="https://github.com/matearg" rel="noopener">{t.activityProfile} ↗</a>
+        </div>
+        <div class="rv" style="display:flex;flex-direction:column;gap:16px;padding:clamp(16px,3vw,28px);border:1px solid var(--border);border-radius:14px;background:rgba(17,17,19,.78)">
+          <div class="cal-scroll">
+            <div class="cal" role="img" aria-label={`${fmt(activity.total)} ${t.activityTotal}`}>
+              {Array.from({ length: pad }, () => <span style="visibility:hidden"></span>)}
+              {activity.days.map((d) => <span class={`cell l${d.level}`} title={`${d.count} · ${d.date}`}></span>)}
+            </div>
+          </div>
+          <div class="mono" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:var(--muted)">
+            <span>{fmt(activity.total)} {t.activityTotal}</span>
+            <span aria-hidden="true" style="display:inline-flex;align-items:center;gap:4px">{t.activityLess} {[0, 1, 2, 3, 4].map((l) => <span class={`cell l${l}`} style="width:12px"></span>)} {t.activityMore}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:24px">
+          {stats.map(([v, k], i) => (
+            <div class={`rv ${['', 'rv2', 'rv3', 'rv3'][i]}`} style="display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid #2a2a2f">
+              <span style="font-size:clamp(32px,4vw,48px);font-weight:600;letter-spacing:-.03em;line-height:1">{v}</span>
+              <span class="mono" style="font-size:12px;color:var(--muted)">{k}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
     <section id="about" class="wrap" style={`${sec};gap:56px`}>
       <div class="rv" style="display:flex;flex-direction:column;gap:14px">
-        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">02 / {t.aboutLabel}</p>
+        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">{num(2)} / {t.aboutLabel}</p>
         <h2 style="margin:0;max-width:16ch;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.aboutTitle}</h2>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:40px 64px;align-items:start">
@@ -70,7 +113,7 @@ const sec = 'padding-block:120px 40px;display:flex;flex-direction:column';
 
     <section id="contact" class="wrap" style="padding-block:120px 80px">
       <div class="rv" style="display:flex;flex-direction:column;gap:28px;padding:clamp(28px,5vw,72px);border:1px solid var(--border);border-radius:20px;background:rgba(17,17,19,.78)">
-        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">03 / {t.contactLabel}</p>
+        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">{num(3)} / {t.contactLabel}</p>
         <h2 style="margin:0;font-size:clamp(44px,7vw,112px);line-height:.95;letter-spacing:-.045em;font-weight:600">{t.contactTitle}</h2>
         <p style="margin:0;max-width:40ch;font-size:19px;line-height:1.5;color:#b4b4bb">{t.contactBody}</p>
         <div style="display:flex;flex-wrap:wrap;gap:12px">

@@ -29,6 +29,26 @@ export async function getProjects(): Promise<Project[]> {
   }
 }
 
+export interface Contributions {
+  total: number;
+  commits: number;
+  pullRequests: number;
+  longestStreak: number;
+  days: { date: string; count: number; level: number }[];
+}
+
+// Null hides the section: GitHub activity is optional on the landing.
+export async function getContributions(): Promise<Contributions | null> {
+  try {
+    const res = await fetch(`${API}/github/contributions`);
+    if (!res.ok) throw new Error(`API responded ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error('getContributions failed:', err);
+    return null;
+  }
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
