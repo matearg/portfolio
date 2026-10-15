@@ -1,0 +1,11 @@
+---
+interface Props { num: string; label: string; title: string; maxWidth?: string; }
+const { num, label, title, maxWidth } = Astro.props;
+---
+<div class="rv" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">{num} / {label}</p>
+    <h2 style={`margin:0;${maxWidth ? `max-width:${maxWidth};` : ''}font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600`}>{title}</h2>
+  </div>
+  <slot />
+</div>

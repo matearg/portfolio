@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from './Hero.astro';
+import SectionHead from './SectionHead.astro';
 import ProjectCard from './ProjectCard.astro';
 import { copy, stack, type Lang } from '../i18n';
 import type { Contributions, Project } from '../lib/api';
@@ -35,13 +36,9 @@ const stats = activity ? [
     </section>
 
     <section id="work" class="wrap" style={`${sec};gap:48px`}>
-      <div class="rv" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">01 / {t.workLabel}</p>
-          <h2 style="margin:0;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.workTitle}</h2>
-        </div>
+      <SectionHead num="01" label={t.workLabel} title={t.workTitle}>
         <a class="ul" href={lang === 'es' ? '/es/projects' : '/projects'}>{t.workAll} →</a>
-      </div>
+      </SectionHead>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px">
         {projects.slice(0, 3).map((p, i) => <ProjectCard project={p} lang={lang} index={i} variant="home" />)}
       </div>
@@ -49,13 +46,9 @@ const stats = activity ? [
 
     {activity && (
       <section id="activity" class="wrap" style={`${sec};gap:40px`}>
-        <div class="rv" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">02 / {t.activityLabel}</p>
-            <h2 style="margin:0;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.activityTitle}</h2>
-          </div>
+        <SectionHead num="02" label={t.activityLabel} title={t.activityTitle}>
           <a class="ul" href="https://github.com/matearg" rel="noopener">{t.activityProfile} ↗</a>
-        </div>
+        </SectionHead>
         <div class="rv" style="display:flex;flex-direction:column;gap:16px;padding:clamp(16px,3vw,28px);border:1px solid var(--border);border-radius:14px;background:rgba(17,17,19,.78)">
           <div class="cal-scroll">
             <div class="cal" role="img" aria-label={`${fmt(activity.total)} ${t.activityTotal}`}>
@@ -80,10 +73,7 @@ const stats = activity ? [
     )}
 
     <section id="about" class="wrap" style={`${sec};gap:56px`}>
-      <div class="rv" style="display:flex;flex-direction:column;gap:14px">
-        <p class="mono" style="margin:0;font-size:13px;color:var(--accent)">{num(2)} / {t.aboutLabel}</p>
-        <h2 style="margin:0;max-width:16ch;font-size:clamp(36px,5vw,72px);line-height:1;letter-spacing:-.035em;font-weight:600">{t.aboutTitle}</h2>
-      </div>
+      <SectionHead num={num(2)} label={t.aboutLabel} title={t.aboutTitle} maxWidth="16ch" />
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:40px 64px;align-items:start">
         <p class="rv" style="margin:0;font-size:clamp(19px,1.8vw,24px);line-height:1.55;color:#c4c4cc">{t.aboutBody}</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:24px">
