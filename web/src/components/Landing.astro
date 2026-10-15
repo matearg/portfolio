@@ -93,7 +93,7 @@ const stats = activity ? [
           {t.exp.map((e) => (
             <li class="rv" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:8px 32px;padding:24px 0;border-top:1px solid #1d1d21">
               <span class="mono" style="font-size:13px;color:var(--muted)">{e.period}</span>
-              <span style="font-size:18px;font-weight:500">{e.role}</span>
+              <span style="font-size:18px;font-weight:500">{e.role} <span style="color:#8f8f98">· {e.company}</span></span>
               <span style="font-size:15px;line-height:1.5;color:#a1a1aa">{e.desc}</span>
             </li>
           ))}
