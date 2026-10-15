@@ -38,6 +38,32 @@ function credentials() {
   };
 }
 
+type Credentials = NonNullable<ReturnType<typeof credentials>>;
+
+// Signed POST to a Cloudinary endpoint; `params` are signed, `file` is sent unsigned.
+async function signedPost(
+  creds: Credentials,
+  endpoint: 'upload' | 'destroy',
+  params: Record<string, string>,
+  file?: Blob,
+) {
+  const signed = { ...params, timestamp: Math.floor(Date.now() / 1000) };
+  const body = new FormData();
+  if (file) body.append('file', file);
+  for (const [k, v] of Object.entries(signed)) body.append(k, String(v));
+  body.append('api_key', creds.key);
+  body.append('signature', sign(signed, creds.secret));
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${creds.cloud}/image/${endpoint}`,
+    { method: 'POST', body },
+  );
+  if (!res.ok) {
+    throw new BadGatewayException(`Image ${endpoint} failed (${res.status})`);
+  }
+  return res;
+}
+
 @Injectable()
 export class CloudinaryService {
   async upload(file: Express.Multer.File): Promise<string> {
@@ -45,26 +71,9 @@ export class CloudinaryService {
     if (!creds) {
       throw new InternalServerErrorException('CLOUDINARY_URL is not set');
     }
-    const { key, secret, cloud } = creds;
-    const params = { folder: FOLDER, timestamp: Math.floor(Date.now() / 1000) };
-    const body = new FormData();
     // Copy: Blob rejects Buffer's ArrayBufferLike (could be shared) under TS 6 typings.
-    body.append(
-      'file',
-      new Blob([new Uint8Array(file.buffer)], { type: file.mimetype }),
-    );
-    body.append('api_key', key);
-    body.append('folder', params.folder);
-    body.append('timestamp', String(params.timestamp));
-    body.append('signature', sign(params, secret));
-
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloud}/image/upload`,
-      { method: 'POST', body },
-    );
-    if (!res.ok) {
-      throw new BadGatewayException(`Image upload failed (${res.status})`);
-    }
+    const blob = new Blob([new Uint8Array(file.buffer)], { type: file.mimetype });
+    const res = await signedPost(creds, 'upload', { folder: FOLDER }, blob);
     return ((await res.json()) as { secure_url: string }).secure_url;
   }
 
@@ -77,22 +86,6 @@ export class CloudinaryService {
   async destroy(publicId: string): Promise<void> {
     const creds = credentials();
     if (!creds) return;
-    const params = {
-      public_id: publicId,
-      timestamp: Math.floor(Date.now() / 1000),
-    };
-    const body = new FormData();
-    body.append('api_key', creds.key);
-    body.append('public_id', params.public_id);
-    body.append('timestamp', String(params.timestamp));
-    body.append('signature', sign(params, creds.secret));
-
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${creds.cloud}/image/destroy`,
-      { method: 'POST', body },
-    );
-    if (!res.ok) {
-      throw new BadGatewayException(`Image destroy failed (${res.status})`);
-    }
+    await signedPost(creds, 'destroy', { public_id: publicId });
   }
 }

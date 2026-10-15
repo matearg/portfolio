@@ -17,17 +17,20 @@ export interface Project {
 
 const API = import.meta.env.API_URL ?? 'http://localhost:3000';
 
-// An API outage degrades to the empty state instead of a 500.
-export async function getProjects(): Promise<Project[]> {
+// Public fetch that degrades to `fallback` instead of throwing.
+async function getPublic<T, F>(path: string, fallback: F): Promise<T | F> {
   try {
-    const res = await fetch(`${API}/projects`);
+    const res = await fetch(`${API}${path}`);
     if (!res.ok) throw new Error(`API responded ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.error('getProjects failed:', err);
-    return [];
+    console.error(`GET ${path} failed:`, err);
+    return fallback;
   }
 }
+
+// An API outage degrades to the empty state instead of a 500.
+export const getProjects = () => getPublic<Project[], Project[]>('/projects', []);
 
 export interface Contributions {
   total: number;
@@ -38,16 +41,7 @@ export interface Contributions {
 }
 
 // Null hides the section: GitHub activity is optional on the landing.
-export async function getContributions(): Promise<Contributions | null> {
-  try {
-    const res = await fetch(`${API}/github/contributions`);
-    if (!res.ok) throw new Error(`API responded ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.error('getContributions failed:', err);
-    return null;
-  }
-}
+export const getContributions = () => getPublic<Contributions, null>('/github/contributions', null);
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
