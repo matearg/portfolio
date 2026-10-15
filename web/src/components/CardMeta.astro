@@ -1,0 +1,15 @@
+---
+import { copy, type Lang } from '../i18n';
+import type { Project } from '../lib/api';
+
+interface Props { project: Project; lang: Lang; links?: boolean }
+const { project, lang, links = true } = Astro.props;
+const t = copy[lang];
+---
+<div style="display:flex;flex-wrap:wrap;gap:6px">{project.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+{links && (
+  <div style="display:flex;flex-wrap:wrap;gap:20px">
+    {project.repoUrl && <a class="lk" href={project.repoUrl} rel="noopener">{t.code} ↗</a>}
+    {project.liveUrl && <a class="lk" href={project.liveUrl} rel="noopener">{t.live} ↗</a>}
+  </div>
+)}
