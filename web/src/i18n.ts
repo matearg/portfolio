@@ -1,6 +1,6 @@
 export type Lang = 'en' | 'es';
 
-export const stack = ['Astro', 'TypeScript', 'Node.js', 'NestJS', 'PostgreSQL', 'Prisma'];
+export const stack = ['Astro', 'TypeScript', 'Node.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Tailwind', 'Angular', 'Docker', 'Hono'];
 
 export const copy = {
   en: {
